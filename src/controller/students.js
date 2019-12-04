@@ -1,9 +1,20 @@
-function addStudent(req, res) { }
+const Student = require("./../models/student");
+
+async function addStudent(req, res) { 
+    const student = new Student({
+        firstName: "a",
+        lastName: "b",
+        email: "ab@test.com"
+    });
+    await student.save();
+    return res.json(student);
+}
 
 function getStudent(req, res) { }
 
-function getAllStudents(req, res) {
-    res.json({ "message": "hello" })
+async function getAllStudents(req, res) {
+    const students = await Student.find();
+    return res.json(students);
  }
 
 function updateStudent(req, res) { }

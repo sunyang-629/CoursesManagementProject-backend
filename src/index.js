@@ -4,7 +4,8 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const routes = require("./routes");
-
+const { connectToDB } = require("./utils/db");
+ 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const morganLog = process.env.NODE_ENV === 'production' ? morgan('common') : morgan('dev');
@@ -16,6 +17,14 @@ app.use(express.json());
 
 app.use("/api", routes);
 
-app.listen(PORT, () => {
-    console.log(`server listen on port ${PORT}`);
+connectToDB().then(() => {
+    console.log('db connected');
+    app.listen(PORT, () => {
+        console.log(`server listen on port ${PORT}`);
+    });
+}).catch(e => {
+    console.log('db connection failed');
+    console.log(e.message);
+    process.exit(1);
 })
+
