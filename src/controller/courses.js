@@ -1,4 +1,5 @@
 const Course = require("./../models/course");
+const Student = require("./../models/student");
 
 async function addCourse(req, res) {
     const { name, code, description } = req.body;
@@ -13,7 +14,7 @@ async function addCourse(req, res) {
 
 async function getCourse(req, res) {
     const { id: code } = req.params;
-    const course = await Course.findById(code).exec();
+    const course = await Course.findById(code).populate('students','firstName lastName').exec();
     if (!course) {
         return res.status(404).json('course not found');
     }

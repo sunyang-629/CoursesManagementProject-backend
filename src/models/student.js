@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const Joi = require("@hapi/joi");
 
 const schema = new mongoose.Schema({
-    _id: {
-        type: String,
-        uppercase: true,
-        alias:"another id"
-    },
+    // _id: {
+    //     type: String,
+    //     uppercase: true,
+    //     alias:"another id"
+    // },
     firstName: {
         type: String,
         required: true      
@@ -22,7 +22,10 @@ const schema = new mongoose.Schema({
             validator:email => !Joi.validate(email,Joi.string().email()).error,
             msg:"Invalid email format"
         }
-    }
+    },
+    courses: [
+        {type:String, ref:"Course"}
+    ]
 })
 
 const Model = mongoose.model("Student", schema);

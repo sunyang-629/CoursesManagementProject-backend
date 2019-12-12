@@ -1,4 +1,5 @@
 const Student = require("./../models/student");
+const Course = require("./../models/course");
 
 async function addStudent(req, res) {
     const { firstName, lastName, email, id } = req.body;
@@ -14,7 +15,7 @@ async function addStudent(req, res) {
 
 async function getStudent(req, res) {
     const { id } = req.params;
-    const student = await Student.findById(id).exec();
+    const student = await Student.findById(id).populate('courses','code name').exec();
     if (!student) {
         return res.status(404),json("student not found")
     }
@@ -49,10 +50,44 @@ async function deleteStudent(req, res) {
     return res.sendStatus(200);
  }
 
+async function addCourse(req, res) {
+    const { id, code } = req.params;
+    const student = await Student.findById(id);
+    const course = await Course.findById(code);
+    if (!student || !course) {
+        return res.status(404).json("student or course not found");
+    }
+    student.courses.addToSet(course._id);
+    course.students.addToSet(student._id);
+    await student.save();
+    await course.save();
+    return res.json(student);
+}
+
+async function deleteCourse(req, res) {
+    const { id, code } = req.params;
+    const student = await Student.findById(id);
+    const course = await Course.findById(code);
+    if (!student || !course) {
+        return res.status(404).json('student or course not found');
+    }
+    const oldCount = student.courses.length;
+    student.courses.pull(course._id);
+    if (student.courses.length === oldCount) {
+        return res.status(404).json('Enrolment does not exit');
+    }
+    course.students.pull(student._id);
+    await student.save();
+    await course.save();
+    return res.json(student);
+}
+
 module.exports = {
     addStudent,
     getStudent,
     getAllStudents,
     updateStudent,
-    deleteStudent
+    deleteStudent,
+    addCourse,
+    deleteCourse
 }
