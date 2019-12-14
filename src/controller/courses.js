@@ -3,6 +3,10 @@ const Student = require("./../models/student");
 
 async function addCourse(req, res) {
     const { name, code, description } = req.body;
+    const existingCourse = await Course.findById(code).exec();
+    if (existingCourse) {
+        return res.status(400).json("Duplicate course code");
+    }
     const course = new Course({
         _id: code,
         name,
@@ -46,6 +50,11 @@ async function deleteCourse(req, res) {
     if (!course) {
         return res.status(404), json("course not found");
     }
+    await Student.updateMany({ courses: course._id }, {
+        $pull: {
+            courses: course._id
+        }
+    })
     return res.sendStatus(200);
  };
 
