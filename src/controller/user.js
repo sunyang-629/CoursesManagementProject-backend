@@ -1,4 +1,5 @@
 const User = require('./../models/user');
+const { generateToken } = require('./../utils/jwt');
 
 async function addUser(req, res) {
     const { username, password } = req.body;
@@ -8,7 +9,8 @@ async function addUser(req, res) {
     }
     const user = new User({ username, password });
     await user.save();
-    return res.json(user);
+    const token = generateToken(user._id);
+    return res.json({username,token});
 }
 
 module.exports = {
